@@ -1,16 +1,22 @@
 package fr.paulduval30.mtgcomunitybuilder;
 
+import java.util.*;
+
 public class Card{
-	private String name;
-	private String text;
-	public Card(String name, String text)
+
+	HashMap<String, String> params;
+	public Card(HashMap<String, String> params)
 	{
-		this.name = name;
-		this.text = text;
+		this.params = params;
 	}
 
-	public String getText()
+	public String getParam(String value)
 	{
-		return this.text;
+		return this.params.get(value);
+	}
+
+	public HashMap<String,String> getParams()
+	{
+		return (HashMap<String,String>)this.params.clone();
 	}
 }

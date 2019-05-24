@@ -16,20 +16,20 @@ public class JSONParser {
 	{
 		jsonFile = new File(url);
 		this.cards = new HashMap<>();
+		long time = System.currentTimeMillis();
+
 		try
 		{
 			this.in = new BufferedReader(new FileReader(jsonFile));
 			String line = "";
 			String load = "";
 			List<String> content;
-			long time = System.currentTimeMillis();
 			content = Files.readAllLines(jsonFile.toPath(), StandardCharsets.UTF_8);
 		    byte [] fileBytes = Files.readAllBytes(jsonFile.toPath());
 			char singleChar;
 			line = new String(fileBytes);
   			System.out.println("casting to object");
 			obj = new JSONObject(line);
-			System.out.println(System.currentTimeMillis() - time);
 
 
 		}
@@ -37,27 +37,59 @@ public class JSONParser {
 		{
 
 		}
-
+		Scanner sc = new Scanner(System.in);
 		for(String s : JSONObject.getNames(obj))
  		{	
- 			try
- 			{
- 				cards.put(s, new Card(s,obj.getJSONObject(s).getString("text")));
- 			}
- 			catch(Exception e)
- 			{
- 				cards.put(s, new Card(s, "TEXT NOT AVAILABLE"));
- 			}
+ 			HashMap<String, String> cardDetail = new HashMap<>();;
+			try
+			{
+				
+				JSONObject card = obj.getJSONObject(s);
+				if(card.has("name"))
+					cardDetail.put("name", card.getString("name"));
+				if(card.has("text"))
+					cardDetail.put("text", card.getString("text"));
+				if(card.has("types"))
+					cardDetail.put("types", card.getJSONArray("types").toString());
+				if(card.has("manaCost"))
+					cardDetail.put("manaCost", card.getString("manaCost"));
+				if(card.has("colorIdentity"))
+					cardDetail.put("colorIdentity", card.getJSONArray("colorIdentity").toString());
+				if(card.has("colors"))
+					cardDetail.put("colors", card.getJSONArray("colors").toString());
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			cards.put(s.toUpperCase(), new Card(cardDetail));
 		}
+		System.out.println(System.currentTimeMillis() - time);
 
-		Scanner sc = new Scanner(System.in);
+
+		
 		String input;
 		System.out.println("ASK ME");
 		while(!(input = sc.nextLine()).equals("quitter"))
 		{
-			Card c = this.cards.get(input);
-			if(c != null)
-				System.out.println(this.cards.get(input).getText());
+			time = System.currentTimeMillis();
+			for(String s : cards.keySet())
+			{
+				Card c = cards.get(s);
+				if(c.getParam("text") == null)
+					continue;
+				if(c.getParam("text").toUpperCase().contains(input.toUpperCase()))
+				{
+					HashMap<String, String> detail = c.getParams();
+					for(String param : detail.keySet())
+					{
+						System.out.println(param + " : " + detail.get(param));
+					}
+					System.out.println();
+				}
+
+			}
+			System.out.println("THE SEARCH OF THE WORD " + input + " took : " + (System.currentTimeMillis() - time) + " MS");
 		}
 	}
 
